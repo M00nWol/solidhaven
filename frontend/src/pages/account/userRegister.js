@@ -20,7 +20,8 @@ const UserRegister = () => {
                     name,
                     email,
                     password
-                }), // JSON 형식으로 데이터 전송
+                }),
+                mode: "cors", // JSON 형식으로 데이터 전송
             });
 
             const data = await response.json();
