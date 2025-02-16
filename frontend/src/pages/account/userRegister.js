@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = process.env.API_BASE_URL;
 
 const UserRegister = () => {
     const [name, setName] = useState(""); // 사용자 이름
@@ -11,7 +11,7 @@ const UserRegister = () => {
 
     const handleSubmit = async () => {
         try {
-            const response = await fetch(`http://43.203.1.187/users/register/`, {
+            const response = await fetch(`${API_BASE_URL}users/register/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

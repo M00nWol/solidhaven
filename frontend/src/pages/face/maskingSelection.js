@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../components/context/UserContext"; // Context 사용
 import "../../styles/maskingSelection.css";
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = process.env.API_BASE_URL;
 
 const MaskingSelection = () => {
     const [faceMasking, setFaceMasking] = useState(false);  // 얼굴 마스킹 여부
