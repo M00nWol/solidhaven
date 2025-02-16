@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useUser } from "../../components/context/UserContext";
 import "../../styles/videoPlayer.css"; // 스타일 추가
 
-const API_BASE_URL = process.env.API_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const VideoPlayer = () => {
     const { videoId } = useParams(); // URL에서 videoId 가져오기

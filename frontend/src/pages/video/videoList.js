@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../../components/context/UserContext";
 import "../../styles/videoList.css"; // 스타일 추가
 
-const API_BASE_URL = process.env.API_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const VideoList = () => {
     const { token, userInfo = {} } = useUser(); // 사용자 정보 가져오기

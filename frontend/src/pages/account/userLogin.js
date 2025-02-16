@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate} from "react-router-dom"; // useLocation으로 전달받은 state 읽기
 import { useUser } from "../../components/context/UserContext"; // UserContext 사용
 import "../../styles/login.css";
-const API_BASE_URL = process.env.API_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const UserLogin = () => {
     const [email, setEmail] = useState(""); //
