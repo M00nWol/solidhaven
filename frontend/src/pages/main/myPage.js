@@ -11,7 +11,7 @@ const MyPage = () => {
     const { token, logout } = useUser();
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
-    const [familyCode, setFamilyCode] = useState("");
+    const [familyCode, setFamilyCode] = useState(null); // familyCode가 null일 수도 있음
     const [isFaceRegistered, setIsFaceRegistered] = useState(false);
     const [faceMasking, setFaceMasking] = useState(false);
     const [bodyMasking, setBodyMasking] = useState(false);
@@ -31,23 +31,24 @@ const MyPage = () => {
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/users/me`, {  // ✅ API 엔드포인트 변경
+                const response = await fetch(`${API_BASE_URL}/users/me`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Token ${token}`,  // ✅ API 문서에 맞춰 Token 사용
+                        "Authorization": `Token ${token}`,
                     },
                 });
 
                 const data = await response.json();
+                console.log("API 응답 데이터:", data);
 
                 if (response.ok) {
-                    setUserName(data.data.username || "[정보 없음]");
-                    setEmail(data.data.email || "[정보 없음]");
-                    setFamilyCode(data.data.family_code || "등록된 가족이 없습니다");
-                    setIsFaceRegistered(data.data.face_registered || false);
-                    setFaceMasking(data.data.masking_settings || false);  // ✅ API 응답에 맞게 변경
-                    setBodyMasking(false);  // ✅ API 응답에서 bodyMasking 정보가 없으므로 기본값 false
+                    setUserName(data.name || "[정보 없음]");
+                    setEmail(data.email || "[정보 없음]");
+                    setFamilyCode(data.family_code || null); // family_code가 없으면 null로 설정
+                    setIsFaceRegistered(data.face_registered ?? false);
+                    setFaceMasking(data.face_masking ?? false);
+                    setBodyMasking(data.body_masking ?? false);
                     setErrorMessage("");
                 } else if (response.status === 401) {
                     alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
@@ -106,12 +107,19 @@ const MyPage = () => {
             <div className="user-info">
                 <p><strong>사용자 이름:</strong> {userName}</p>
                 <p><strong>이메일:</strong> {email}</p>
-                <p><strong>가족 코드:</strong> {familyCode}</p>
+                <p><strong>가족 코드:</strong> {familyCode ? familyCode : "등록된 가족이 없습니다"}</p>
 
-                {/* 가족 로그인 / 가입 버튼 */}
+                {/* ✅ 가족 코드가 있으면 가족 로그인 / 가입 버튼, 없으면 가족 재등록 버튼 */}
                 <div className="family-action-buttons-inline">
-                    <button className="button" onClick={() => setShowFamilyLogin(true)}>가족 로그인</button>
-                    <button className="button" onClick={() => setShowFamilyRegister(true)}>가족 회원가입</button>
+                    {familyCode ? (
+                        <button className="button" onClick={() => setShowFamilyLogin(true)}>가족 재등록</button>
+                    ) : (
+                        
+                        <>
+                            <button className="button" onClick={() => setShowFamilyLogin(true)}>가족 로그인</button>
+                            <button className="button" onClick={() => setShowFamilyRegister(true)}>가족 회원가입</button>
+                        </>
+                    )}
                 </div>
 
                 {/* 얼굴 등록 여부 */}
