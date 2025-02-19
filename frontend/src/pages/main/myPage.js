@@ -8,7 +8,7 @@ import FamilyRegisterModal from "../account/familyRegisterModal";
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const MyPage = () => {
-    const { userId, token, logout } = useUser();
+    const { token, logout } = useUser();
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [familyCode, setFamilyCode] = useState("");
@@ -24,18 +24,18 @@ const MyPage = () => {
     // ✅ 사용자 정보 가져오기
     useEffect(() => {
         const fetchUserInfo = async () => {
-            if (!userId || !token) {
+            if (!token) {
                 setErrorMessage("로그인이 필요합니다.");
                 navigate("/userlogin");
                 return;
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/user/${userId}/`, {
+                const response = await fetch(`${API_BASE_URL}/users/me`, {  // ✅ API 엔드포인트 변경
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
+                        "Authorization": `Token ${token}`,  // ✅ API 문서에 맞춰 Token 사용
                     },
                 });
 
@@ -46,15 +46,13 @@ const MyPage = () => {
                     setEmail(data.data.email || "[정보 없음]");
                     setFamilyCode(data.data.family_code || "등록된 가족이 없습니다");
                     setIsFaceRegistered(data.data.face_registered || false);
-                    setFaceMasking(data.data.face_masking || false);
-                    setBodyMasking(data.data.body_masking || false);
+                    setFaceMasking(data.data.masking_settings || false);  // ✅ API 응답에 맞게 변경
+                    setBodyMasking(false);  // ✅ API 응답에서 bodyMasking 정보가 없으므로 기본값 false
                     setErrorMessage("");
                 } else if (response.status === 401) {
                     alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
                     logout();
                     navigate("/userlogin");
-                } else if (response.status === 404) {
-                    setErrorMessage("사용자 정보를 찾을 수 없습니다.");
                 } else {
                     setErrorMessage(data.message || "정보를 불러오지 못했습니다.");
                 }
@@ -64,19 +62,19 @@ const MyPage = () => {
             }
         };
 
-        if (userId && token) {
+        if (token) {
             fetchUserInfo();
         }
-    }, [userId, token, navigate, logout]);
+    }, [token, navigate, logout]);
 
     // ✅ 마스킹 설정 업데이트 함수
     const updateMaskingSettings = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/user/${userId}/masking/`, {
+            const response = await fetch(`${API_BASE_URL}/users/me/masking/`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
+                    "Authorization": `Token ${token}`,
                 },
                 body: JSON.stringify({
                     face_masking: faceMasking,
