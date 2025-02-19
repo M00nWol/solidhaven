@@ -1,27 +1,33 @@
 import React, { useState } from "react";
-import "../../styles/modal.css"; 
+import "../../styles/modal.css";
 import { useUser } from "../../components/context/UserContext";
+
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const FamilyLoginModal = ({ onClose }) => {
-    const { userId, token } = useUser(); 
+    const { token, login } = useUser(); // ✅ UserContext에서 `token`, `login` 가져오기
     const [familyCode, setFamilyCode] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
 
     const handleLogin = async () => {
+        if (!token) {
+            setMessage("로그인이 필요합니다.");
+            setIsSuccess(false);
+            return;
+        }
+
         try {
-            const response = await fetch(`${API_BASE_URL}/families/login/`, { 
+            const response = await fetch(`${API_BASE_URL}/users/family-login/`, { // ✅ 올바른 API 엔드포인트 사용
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`, 
+                    "Authorization": `Token ${token}`, // ✅ `Bearer` → `Token`으로 수정
                 },
                 body: JSON.stringify({
                     family_code: familyCode,
                     password, 
-                    user_id: userId, 
                 }),
             });
 
@@ -30,6 +36,9 @@ const FamilyLoginModal = ({ onClose }) => {
             if (response.ok) {
                 setMessage("가족 로그인에 성공했습니다!");
                 setIsSuccess(true);
+
+                // ✅ `UserContext`에 `user` & `family` 정보 저장
+                login(token, { ...data.user, family: data.family });
             } else {
                 if (response.status === 401) {
                     setMessage("가족 코드 또는 비밀번호가 일치하지 않습니다.");

@@ -1,23 +1,31 @@
 import React, { useState } from "react";
 import "../../styles/modal.css";
+import { useUser } from "../../components/context/UserContext"; // ✅ 로그인 토큰 가져오기
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const FamilyRegisterModal = ({ onClose }) => {
-    const [username, setUsername] = useState("");
+    const { token } = useUser(); // ✅ 토큰 가져오기 (필수)
+    const [familyName, setFamilyName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
     const [familyCode, setFamilyCode] = useState("");
 
     const handleRegister = async () => {
+        if (!token) {
+            setMessage("로그인이 필요합니다.");
+            return;
+        }
+
         try {
-            const response = await fetch(`${API_BASE_URL}/families/register/`, {
+            const response = await fetch(`${API_BASE_URL}/users/family-register/`, { // ✅ API 경로 수정
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Token ${token}`, // ✅ 헤더에 인증 토큰 추가
                 },
                 body: JSON.stringify({
-                    username,
+                    name: familyName, // ✅ API 문서에 맞게 필드명 수정
                     email,
                     password,
                 }),
@@ -26,7 +34,7 @@ const FamilyRegisterModal = ({ onClose }) => {
             const data = await response.json();
 
             if (response.ok) {
-                setFamilyCode(data.family_code || "가족 코드 생성 실패");
+                setFamilyCode(data.family.family_code || "가족 코드 생성 실패");
                 setMessage("가족 회원가입이 완료되었습니다!");
             } else {
                 setMessage(data.message || "이미 존재하는 가족 이메일입니다.");
@@ -46,8 +54,8 @@ const FamilyRegisterModal = ({ onClose }) => {
                         <input
                             type="text"
                             placeholder="가족 이름을 입력하세요"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            value={familyName}
+                            onChange={(e) => setFamilyName(e.target.value)}
                         />
                         <input
                             type="email"
