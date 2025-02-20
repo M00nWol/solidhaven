@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../../styles/login.css"; // 로그인 페이지 스타일과 통일
+
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const UserRegister = () => {
@@ -27,7 +29,7 @@ const UserRegister = () => {
 
             if (response.ok) {
                 alert("회원가입이 완료되었습니다!");
-                navigate("/userlogin"); 
+                navigate("/userlogin");
             } else {
                 if (response.status === 400) {
                     if (data?.error?.email && Array.isArray(data.error.email) && data.error.email.length > 0) {
@@ -48,7 +50,7 @@ const UserRegister = () => {
     };
 
     return (
-        <div className="register-container">
+        <div className="login-container"> {/* 로그인 페이지와 동일한 스타일 적용 */}
             <h1>사용자 회원가입</h1>
 
             <div className="form-group">
@@ -59,6 +61,7 @@ const UserRegister = () => {
                     placeholder="사용자 이름을 입력하세요"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    className="input"
                 />
             </div>
             <div className="form-group">
@@ -69,6 +72,7 @@ const UserRegister = () => {
                     placeholder="이메일을 입력하세요"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className="input"
                 />
             </div>
             <div className="form-group">
@@ -76,15 +80,18 @@ const UserRegister = () => {
                 <input
                     type="password"
                     id="password"
-                    placeholder="비밀번호를 입력하세요"
+                    placeholder="8자리 이상 비밀번호를 입력하세요"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="input"
                 />
             </div>
             {errorMessage && <p className="error">{errorMessage}</p>}
-            <button onClick={handleSubmit} className="button">
-                회원가입
-            </button>
+            <div className="button-group">
+                <button onClick={handleSubmit} className="button">
+                    회원가입
+                </button>
+            </div>
         </div>
     );
 };
