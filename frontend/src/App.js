@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { UserProvider } from "./components/context/UserContext"; // UserContext import
 import { UserLogin, UserRegister, AccountMain } from "./pages"; // account 폴더에서 한 번에 가져오기
-import { FaceRegister, MaskingSelection } from "./pages";
+import { FaceRegister, MaskingSelection, FaceVerify } from "./pages";
 import { Dashboard, MyPage } from "./pages";
 import { VideoDashboard, VideoList, VideoUpload, VideoPlayer } from "./pages"; 
 
@@ -19,6 +19,7 @@ const App = () => {
                     {/* 얼굴 등록 및 마스킹 설정 페이지 */}
                     <Route path="/faceregister" element={<FaceRegister />} />
                     <Route path="/maskingselection" element={<MaskingSelection />} />
+                    <Route path="/faceverify" element={<FaceVerify />} />
 
                     {/* 대시보드 */}
                     <Route path="/dashboard" element={<Dashboard />} />

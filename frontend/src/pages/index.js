@@ -4,6 +4,7 @@ export { default as AccountMain } from "./account/accountMain";
 
 export { default as FaceRegister } from "./face/faceRegister";
 export { default as MaskingSelection } from "./face/maskingSelection";
+export { default as FaceVerify } from "./face/faceVerify";
 
 export { default as MyPage } from "./main/myPage";
 export { default as Dashboard } from "./main/dashboard";
