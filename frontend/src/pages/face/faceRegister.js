@@ -67,12 +67,19 @@ const FaceRegister = () => {
         }
     };
 
-    // ✅ 웹캠 켜기
+    // ✅ 웹캠 켜기 (모바일 대응)
     const startWebcam = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             videoRef.current.srcObject = stream;
             setIsCameraOn(true);
+
+            // ✅ 모바일에서도 자동 재생되도록 play() 실행
+            setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.play().catch(error => console.error("자동 재생 실패:", error));
+                }
+            }, 500); // 일부 기기에서 play() 호출이 지연될 수 있어 setTimeout 사용
         } catch (error) {
             console.error("웹캠 접근 오류:", error);
             setMessage("웹캠을 사용할 수 없습니다. 브라우저 설정을 확인하세요.");
@@ -179,7 +186,7 @@ const FaceRegister = () => {
             </div>
 
             <div className="register-section">
-                <h2>실시간 등록 (웹캠)</h2>
+                <h2>실시간 등록</h2>
                 <div className="webcam-container">
                     <video ref={videoRef} autoPlay width="400" height="300" style={{ display: isCameraOn ? "block" : "none" }} />
                     <canvas ref={canvasRef} width="400" height="300" style={{ display: "none" }} />
