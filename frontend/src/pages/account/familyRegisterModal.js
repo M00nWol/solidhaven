@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import "../../styles/modal.css";
-import { useUser } from "../../components/context/UserContext"; // ✅ 로그인 토큰 가져오기
+import { useUser } from "../../components/context/UserContext"; 
+
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const FamilyRegisterModal = ({ onClose }) => {
-    const { token } = useUser(); // ✅ 토큰 가져오기 (필수)
+    const { token } = useUser();
     const [familyName, setFamilyName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -18,14 +19,14 @@ const FamilyRegisterModal = ({ onClose }) => {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/users/family-register/`, { // ✅ API 경로 수정
+            const response = await fetch(`${API_BASE_URL}/users/family-register/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Token ${token}`, // ✅ 헤더에 인증 토큰 추가
+                    "Authorization": `Token ${token}`,
                 },
                 body: JSON.stringify({
-                    name: familyName, // ✅ API 문서에 맞게 필드명 수정
+                    name: familyName,
                     email,
                     password,
                 }),
@@ -48,6 +49,7 @@ const FamilyRegisterModal = ({ onClose }) => {
     return (
         <div className="modal-container">
             <div className="modal-content">
+                <button className="modal-close-button" onClick={onClose}>✖</button>
                 <h2>가족 회원가입</h2>
                 {!familyCode ? (
                     <>
@@ -70,16 +72,12 @@ const FamilyRegisterModal = ({ onClose }) => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                         {message && <p className="modal-message">{message}</p>}
-                        <div className="modal-buttons">
-                            <button onClick={handleRegister} className="submit-button">회원가입</button>
-                            <button onClick={onClose} className="cancel-button">닫기</button>
-                        </div>
+                        <button onClick={handleRegister} className="submit-button">회원가입</button>
                     </>
                 ) : (
                     <div>
                         <p className="modal-message">{message}</p>
                         <p><strong>가족 코드:</strong> {familyCode}</p>
-                        <button onClick={onClose} className="submit-button">닫기</button>
                     </div>
                 )}
             </div>

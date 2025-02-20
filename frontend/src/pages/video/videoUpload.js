@@ -20,29 +20,30 @@ const VideoUpload = () => {
             setMessage("⚠️ 파일을 선택해주세요!");
             return;
         }
-
-        // 현재 날짜와 시간을 기반으로 파일명 생성 (YYYYMMDD_HHMMSS.mp4)
+    
+        // 현재 날짜와 시간을 기반으로 파일명 생성 (YYYY-MM-DD_HH-MM-SS.mp4)
         const now = new Date();
-        const formattedDate = now.toISOString().replace(/[-T:.Z]/g, "").slice(0, 15); // YYYYMMDD_HHMMSS
-        const fileName = `${formattedDate}.mp4`;
-
+        const formattedDate = now.toISOString().split("T")[0]; // YYYY-MM-DD
+        const formattedTime = now.toTimeString().split(" ")[0].replace(/:/g, "-"); // HH-MM-SS
+        const fileName = `${formattedDate}_${formattedTime}.mp4`; // 최종 파일명
+    
         const formData = new FormData();
         formData.append("title", fileName); // 자동 생성된 제목
         formData.append("file", selectedFile);
-
+    
         try {
             const response = await fetch(`${API_BASE_URL}/videos/upload/`, {
                 method: "POST",
                 headers: {
-                    "Authorization": `Token ${token}`, // ✅ 백엔드 요구사항 반영 (Bearer → Token)
+                    "Authorization": `Token ${token}`,
                 },
                 body: formData,
             });
-
+    
             const data = await response.json();
-
+    
             if (response.ok) {
-                setMessage("✅ 영상이 성공적으로 업로드되었습니다!");
+                setMessage(`✅ 영상이 성공적으로 업로드되었습니다! 파일명: ${fileName}`);
             } else if (response.status === 400 && data.file) {
                 setMessage("⚠️ 파일을 선택해주세요.");
             } else {
@@ -53,6 +54,7 @@ const VideoUpload = () => {
             setMessage("❌ 서버와 연결할 수 없습니다.");
         }
     };
+    
 
     return (
         <div className="video-upload-container">
