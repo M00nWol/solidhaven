@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../components/context/UserContext";
-import "../../styles/videoList.css"; // 스타일 추가
+import "../../styles/videoList.css"; // 스타일 유지
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const VideoList = () => {
-    const { token, userInfo = {} } = useUser(); // 사용자 정보 가져오기
+    const { token } = useUser(); 
     const navigate = useNavigate();
     const [videos, setVideos] = useState([]);
     const [errorMessage, setErrorMessage] = useState("");
@@ -33,7 +33,7 @@ const VideoList = () => {
         return grouped;
     };
 
-    // ✅ 주석 처리된 API 호출 부분
+    // ✅ 영상 목록 가져오기
     useEffect(() => {
         const fetchVideos = async () => {
             if (!token) {
@@ -41,24 +41,18 @@ const VideoList = () => {
                 return;
             }
 
-            const queryParams = new URLSearchParams();
-            queryParams.append("ref", userInfo.family_id ? 1 : 0); // 1: 가족, 0: 개인
-            if (userInfo.family_id) {
-                queryParams.append("family_id", userInfo.family_id); // 가족 ID 추가
-            }
-
             try {
-                const response = await fetch(`${API_BASE_URL}/videos?${queryParams.toString()}`, {
+                const response = await fetch(`${API_BASE_URL}/videos/`, {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${token}`,
+                        "Authorization": `Token ${token}`, // ✅ 백엔드 요구사항에 맞춤
                     },
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    setVideos(data.videos || []);
+                    setVideos(data || []); // ✅ 백엔드 응답 구조에 맞게 수정
                 } else {
                     setErrorMessage(data.message || "영상 목록을 불러오지 못했습니다.");
                 }
@@ -69,27 +63,15 @@ const VideoList = () => {
         };
 
         fetchVideos();
-    }, [token, userInfo.family_id]);
-
-    // ✅ 백엔드 연결 전 테스트할 경우 아래 주석 해제
-    /*
-    useEffect(() => {
-        const mockVideos = [
-            { id: 1, title: "테스트 영상 1", uploaded_at: "2025-01-19T10:00:00Z" },
-            { id: 2, title: "테스트 영상 2", uploaded_at: "2025-01-19T10:05:00Z" },
-            { id: 3, title: "테스트 영상 3", uploaded_at: "2025-01-19T14:30:00Z" },
-            { id: 4, title: "테스트 영상 4", uploaded_at: "2025-01-20T14:35:00Z" },
-            { id: 5, title: "테스트 영상 5", uploaded_at: "2025-01-20T14:40:00Z" },
-        ];
-        setVideos(mockVideos);
-    }, []);
-    */
+    }, [token]);
 
     const groupedVideos = groupVideosByDateAndTime(videos);
 
     return (
         <div className="video-list-container">
-            <h1>영상 목록</h1>
+            <h1>📂 영상 목록</h1>
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
+            
             {Object.keys(groupedVideos).length === 0 ? (
                 <p>등록된 영상이 없습니다.</p>
             ) : (
@@ -109,8 +91,12 @@ const VideoList = () => {
                                             <div key={`${date}-${hour}-${minute}`} className="video-minute-group">
                                                 <h4>{hour}:{minute.toString().padStart(2, "0")}</h4>
                                                 {groupedVideos[date][hour][minute].map((video) => (
-                                                    <div key={video.id} className="video-item" onClick={() => navigate(`/videos/${video.id}`)}>
-                                                        <p>{video.title}</p>
+                                                    <div 
+                                                        key={video.id} 
+                                                        className="video-item" 
+                                                        onClick={() => navigate(`/videos/${video.id}`, { state: { video } })} // ✅ video 데이터 전달
+                                                    >
+                                                        <p>📹 {video.title} ({video.user_name})</p>
                                                     </div>
                                                 ))}
                                             </div>
