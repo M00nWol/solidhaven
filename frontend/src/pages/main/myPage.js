@@ -141,17 +141,21 @@ const MyPage = () => {
 
                 {/* ✅ 전체 가족 목록 */}
                 <p><strong>전체 가족 목록:</strong></p>
-                {familyList.length > 0 ? (
-                    <ul>
-                        {familyList.map((fam, index) => (
-                            <li key={index} className={fam.code === currentFamilyCode ? "current-family" : ""}>
-                                <strong>{fam.name}:</strong> {fam.code}
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>등록된 가족이 없습니다.</p>
-                )}
+                <div className="family-list">
+                    {familyList.length > 0 ? (
+                        familyList.map((fam, index) => (
+                            <div 
+                                key={index} 
+                                className={`family-card ${fam.code === currentFamilyCode ? "current" : ""}`}
+                            >
+                                <p><strong>{fam.name}</strong></p>
+                                <p>{fam.code}</p>
+                            </div>
+                        ))
+                    ) : (
+                        <p>등록된 가족이 없습니다.</p>
+                    )}
+                </div>
 
                 {/* ✅ 가족 관리 버튼 */}
                 <div className="family-action-buttons-inline">

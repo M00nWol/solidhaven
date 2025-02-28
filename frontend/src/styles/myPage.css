@@ -103,9 +103,32 @@ input:checked + .slider::before {
     color: #ff5722;
 }
 
-.current-family {
+
+.family-list {
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+    max-width: 400px; /* 가로 최대 너비 제한 */
+}
+
+.family-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    width: 120px; /* 크기 통일 */
+    text-align: center;
+    font-size: 14px;
+}
+
+.family-card:hover {
+    transform: scale(1.05);
+}
+
+.family-card.current {
+    background-color: #ffebcd; /* 현재 가족 강조 */
     font-weight: bold;
-    background-color: #ffe0b2;
-    padding: 4px;
-    border-radius: 5px;
 }
