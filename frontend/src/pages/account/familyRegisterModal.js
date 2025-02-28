@@ -21,6 +21,7 @@ const FamilyRegisterModal = ({ onClose }) => {
         try {
             const response = await fetch(`${API_BASE_URL}/users/family-register/`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Token ${token}`,

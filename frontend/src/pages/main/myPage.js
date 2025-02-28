@@ -93,6 +93,7 @@ const MyPage = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/users/masking-settings/`, {
                 method: "PATCH",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Token ${token}`,

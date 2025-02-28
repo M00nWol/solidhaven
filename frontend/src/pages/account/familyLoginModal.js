@@ -23,6 +23,7 @@ const FamilyLoginModal = ({ onClose }) => {
         try {
             const response = await fetch(`${API_BASE_URL}/users/family-login/`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Token ${token}`,

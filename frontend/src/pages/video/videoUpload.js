@@ -34,6 +34,7 @@ const VideoUpload = () => {
         try {
             const response = await fetch(`${API_BASE_URL}/videos/upload/`, {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Authorization": `Token ${token}`,
                 },

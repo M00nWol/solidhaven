@@ -44,6 +44,7 @@ const VideoList = () => {
             try {
                 const response = await fetch(`${API_BASE_URL}/videos/`, {
                     method: "GET",
+                    credentials: "include",
                     headers: {
                         "Authorization": `Token ${token}`, // ✅ 백엔드 요구사항에 맞춤
                     },
