@@ -1,0 +1,69 @@
+.masking-selection-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.selection-group {
+    margin: 20px 0;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #e9ecef; /* 기본 배경색 (회색) */
+    color: #333; /* 기본 텍스트 색상 */
+}
+
+button.selected {
+    background-color: #007bff; /* 선택된 버튼의 배경색 (파란색) */
+    color: white; /* 선택된 버튼의 텍스트 색상 (흰색) */
+}
+
+button:not(.selected):hover {
+    background-color: #d6d8db; /* 선택되지 않은 버튼 hover 배경색 */
+}
+
+button.selected:hover {
+    background-color: #0056b3; /* 선택된 버튼 hover 배경색 */
+}
+
+.save-button {
+    margin-top: 20px;
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    background-color: #28a745; /* 저장 버튼 색상 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+    background-color: #218838; /* 저장 버튼 hover 색상 */
+}

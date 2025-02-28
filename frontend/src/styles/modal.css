@@ -1,0 +1,108 @@
+/* 모달 전체 스타일 */
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4); /* 반투명 배경 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 모달 박스 내부에 X 버튼 포함되도록 설정 */
+.modal-content {
+    background: white;
+    width: 400px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeIn 0.3s ease-in-out;
+    position: relative; /* X 버튼의 기준점 설정 */
+}
+
+/* 모달 헤더 */
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* 입력 필드 스타일 */
+.modal-content input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+/* 입력 필드 포커스 시 스타일 */
+.modal-content input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* 버튼 스타일 */
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.submit-button {
+    flex: 1;
+    margin-right: 10px;
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+/* X 버튼 스타일 */
+.modal-close-button {
+    position: absolute;
+    top: 12px; /* 상단 여백 */
+    right: 15px; /* 우측 여백 */
+    background: none;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.modal-close-button:hover {
+    color: #000;
+    transform: scale(1.1);
+}
+
+
+
+
+/* 모달 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

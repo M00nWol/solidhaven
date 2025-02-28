@@ -1,0 +1,54 @@
+.video-list-container {
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+}
+
+.video-date-group {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f4f4f4;
+    border-radius: 8px;
+}
+
+.video-date-group h2 {
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.video-hour-group {
+    margin-left: 20px;
+    padding: 8px;
+    background: #e8e8e8;
+    border-radius: 6px;
+}
+
+.video-hour-group h3 {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.video-minute-group {
+    margin-left: 40px;
+    padding: 5px;
+    border-left: 2px solid #ccc;
+}
+
+.video-minute-group h4 {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.video-item {
+    padding: 5px;
+    margin-left: 60px;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.video-item:hover {
+    background: #e0e0e0;
+}

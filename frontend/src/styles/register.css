@@ -1,0 +1,57 @@
+/* 기본 컨테이너 스타일 */
+.register-container {
+    text-align: center;
+    margin-top: 50px;
+}
+
+/* 버튼 그룹 스타일 */
+.button-group {
+    margin-top: 20px;
+}
+
+/* 버튼 스타일 */
+.button {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* 모달 배경 스타일 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 모달 내용 스타일 */
+.modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+}
+
+/* 입력 필드 스타일 */
+.input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 모달 버튼 그룹 스타일 */
+.modal-buttons {
+    margin-top: 20px;
+}
