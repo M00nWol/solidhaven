@@ -24,62 +24,69 @@ const MyPage = () => {
     const navigate = useNavigate();
 
     // ✅ 사용자 정보 가져오기
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            if (!token) {
-                setErrorMessage("로그인이 필요합니다.");
-                navigate("/userlogin");
-                return;
-            }
+    const fetchUserInfo = async () => {
+        if (!token) {
+            setErrorMessage("로그인이 필요합니다.");
+            navigate("/userlogin");
+            return;
+        }
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/users/me`, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Token ${token}`,
-                    },
-                });
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/me`, {
+                method: "GET",
+                credentials: "include",  // ✅ Django 세션 쿠키 포함
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Token ${token}`,
+                },
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (response.ok) {
-                    setUserName(data.name || "[정보 없음]");
-                    setEmail(data.email || "[정보 없음]");
-                    setIsFaceRegistered(data.face_registered ?? false);
-                    setFaceMasking(data.face_masking ?? false);
-                    setBodyMasking(data.body_masking ?? false);
+            if (response.ok) {
+                setUserName(data.name || "[정보 없음]");
+                setEmail(data.email || "[정보 없음]");
+                setIsFaceRegistered(data.face_registered ?? false);
+                setFaceMasking(data.face_masking ?? false);
+                setBodyMasking(data.body_masking ?? false);
 
-                    // ✅ 현재 로그인된 가족 코드 저장
-                    setCurrentFamilyCode(data.current_family_code || null);
+                // ✅ 현재 로그인된 가족 코드 업데이트
+                setCurrentFamilyCode(data.current_family_code || null);
 
-                    // ✅ 전체 가족 리스트 업데이트
-                    if (data.family && Array.isArray(data.family)) {
-                        setFamilyList(data.family.map(fam => ({
-                            name: fam.name,
-                            code: fam.family_code
-                        })));
-                    } else {
-                        setFamilyList([]);
-                    }
-                } else if (response.status === 401) {
-                    alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
-                    logout();
-                    navigate("/userlogin");
+                // ✅ 전체 가족 리스트 업데이트
+                if (data.family && Array.isArray(data.family)) {
+                    setFamilyList(data.family.map(fam => ({
+                        name: fam.name,
+                        code: fam.family_code
+                    })));
                 } else {
-                    setErrorMessage(data.message || "정보를 불러오지 못했습니다.");
+                    setFamilyList([]);
                 }
-            } catch (error) {
-                console.error("API 호출 오류:", error);
-                setErrorMessage("서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+            } else if (response.status === 401) {
+                alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+                logout();
+                navigate("/userlogin");
+            } else {
+                setErrorMessage(data.message || "정보를 불러오지 못했습니다.");
             }
-        };
+        } catch (error) {
+            console.error("API 호출 오류:", error);
+            setErrorMessage("서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
+        }
+    };
 
+    // ✅ useEffect: 로그인 & 가족 코드 변경 시 자동 업데이트
+    useEffect(() => {
         if (token) {
             fetchUserInfo();
         }
-    }, [token, navigate, logout]);
+    }, [token, currentFamilyCode]);
+
+    // ✅ 가족 로그인 성공 후 사용자 정보 갱신
+    const handleFamilyLoginSuccess = () => {
+        fetchUserInfo();  // 로그인 후 사용자 정보 다시 가져오기
+        setShowFamilyLogin(false);
+    };
 
     // ✅ 마스킹 설정 업데이트 함수
     const updateMaskingSettings = async () => {
@@ -100,7 +107,6 @@ const MyPage = () => {
 
             if (response.ok) {
                 setSuccessMessage("✅ 마스킹 설정이 업데이트 되었습니다.");
-                setUserName(data.user?.name || userName);
                 setFaceMasking(data.user?.face_masking ?? faceMasking);
                 setBodyMasking(data.user?.body_masking ?? bodyMasking);
             } else {
@@ -181,7 +187,8 @@ const MyPage = () => {
                 <button className="button" onClick={updateMaskingSettings}>마스킹 설정 변경 저장</button>
             </div>
 
-            {showFamilyLogin && <FamilyLoginModal onClose={() => setShowFamilyLogin(false)} />}
+            {/* ✅ 가족 로그인 모달 */}
+            {showFamilyLogin && <FamilyLoginModal onClose={() => setShowFamilyLogin(false)} onSuccess={handleFamilyLoginSuccess} />}
             {showFamilyRegister && <FamilyRegisterModal onClose={() => setShowFamilyRegister(false)} />}
         </div>
     );
