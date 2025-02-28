@@ -54,8 +54,8 @@ const MyPage = () => {
                 setCurrentFamilyCode(data.current_family_code || null);
 
                 // ✅ 전체 가족 리스트 업데이트
-                if (data.family && Array.isArray(data.family)) {
-                    setFamilyList(data.family.map(fam => ({
+                if (data.families && Array.isArray(data.families)) {
+                    setFamilyList(data.families.map(fam => ({
                         name: fam.name,
                         code: fam.family_code
                     })));
