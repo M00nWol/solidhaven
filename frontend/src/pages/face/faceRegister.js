@@ -40,8 +40,9 @@ const FaceRegister = () => {
         const formData = new FormData();
         formData.append("face_image", selectedFile);
 
+        console.log("현재 저장된 토큰:", token);
         try {
-            const response = await fetch(`${API_BASE_URL}/face-register/photo/`, {
+            const response = await fetch(`${API_BASE_URL}/detection/face-register/photo/`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`
@@ -129,8 +130,10 @@ const FaceRegister = () => {
             formData.append("face_images", image, `face_${index}.jpg`);
         });
 
+        console.log("현재 저장된 토큰:", token);
+
         try {
-            const response = await fetch(`${API_BASE_URL}/face-register/realtime/`, {
+            const response = await fetch(`${API_BASE_URL}/detection/face-register/realtime/`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`
