@@ -8,6 +8,7 @@ const VideoUpload = () => {
     const { token } = useUser();
     const [selectedFile, setSelectedFile] = useState(null);
     const [message, setMessage] = useState("");
+    const [isUploading, setIsUploading] = useState(false);
 
     // 파일 선택 핸들러
     const handleFileChange = (event) => {
@@ -21,6 +22,8 @@ const VideoUpload = () => {
             return;
         }
     
+        setIsUploading(true); // 업로드 시작 시 상태 변경
+        
         // 현재 날짜와 시간을 기반으로 파일명 생성 (YYYY-MM-DD_HH-MM-SS.mp4)
         const now = new Date();
         const formattedDate = now.toISOString().split("T")[0]; // YYYY-MM-DD
@@ -53,15 +56,24 @@ const VideoUpload = () => {
         } catch (error) {
             console.error("API 호출 오류:", error);
             setMessage("❌ 서버와 연결할 수 없습니다.");
+        } finally {
+            setIsUploading(false); // 업로드 완료 시 상태 변경
         }
     };
     
-
     return (
         <div className="video-upload-container">
             <h1>🎥 영상 업로드</h1>
             <input type="file" accept="video/*" onChange={handleFileChange} />
-            <button onClick={handleUpload} className="button">업로드</button>
+            <button onClick={handleUpload} className="button" disabled={isUploading}>
+                {isUploading ? "업로드 중..." : "업로드"}
+            </button>
+            {isUploading && (
+                <div className="uploading-indicator">
+                    <img src="/loading.gif" alt="업로드 중" className="loading-gif" style={{ width: "50px", height: "50px" }}/>
+                    <p>영상 처리 중입니다. 잠시만 기다려주세요...</p>
+                </div>
+            )}
             {message && <p className="message">{message}</p>}
         </div>
     );

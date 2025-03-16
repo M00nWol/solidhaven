@@ -5,6 +5,7 @@ import "../../styles/videoPlayer.css"; // 스타일 유지
 const VideoPlayer = () => {
     const location = useLocation();
     const videoData = location.state?.video; // ✅ `VideoList.js`에서 전달된 데이터 사용
+    console.log(videoData.masked_file);
 
     return (
         <div className="video-player-container">
