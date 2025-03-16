@@ -15,7 +15,7 @@ const VideoPlayer = () => {
                 <div className="video-content">
                     <h2>{videoData.title}</h2>
                     <video controls>
-                        <source src={videoData.file} type="video/mp4" />
+                        <source src={videoData.masked_file} type="video/mp4" />
                         해당 브라우저에서는 동영상을 재생할 수 없습니다.
                     </video>
                     <p>📅 업로드 시간: {new Date(videoData.uploaded_at).toLocaleString()}</p>
