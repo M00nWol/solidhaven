@@ -91,7 +91,7 @@ const MyPage = () => {
     // ✅ 마스킹 설정 업데이트 함수
     const updateMaskingSettings = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/users/masking-settings/`, {
+            const response = await fetch(`${API_BASE_URL}/masking-settings/`, {
                 method: "PATCH",
                 credentials: "include",
                 headers: {
