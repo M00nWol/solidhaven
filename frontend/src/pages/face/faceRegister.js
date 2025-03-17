@@ -45,7 +45,7 @@ const FaceRegister = () => {
             const response = await fetch(`${API_BASE_URL}/detection/face-register/photo/`, {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Token ${token}`
                 },
                 body: formData,
             });
@@ -136,7 +136,7 @@ const FaceRegister = () => {
             const response = await fetch(`${API_BASE_URL}/detection/face-register/realtime/`, {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Token ${token}`
                 },
                 body: formData,
             });
