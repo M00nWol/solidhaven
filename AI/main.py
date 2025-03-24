@@ -131,3 +131,36 @@ async def register_face(
 
     except Exception as e:
         return JSONResponse({"error": f"🚨 서버 내부 오류: {str(e)}"}, status_code=500)
+
+
+@app.post("/check_similarity/")
+async def check_similarity(
+    file: UploadFile = File(...),
+    embedding: str = Form(...),
+):
+    try:
+        # 🔹 업로드된 이미지 읽기
+        contents = await file.read()
+        np_arr = np.frombuffer(contents, np.uint8)
+        image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+        # 🔹 업로드된 임베딩 파싱 및 정규화
+        target_embedding = np.array(json.loads(embedding))
+        target_embedding = target_embedding / np.linalg.norm(target_embedding)
+
+        # 🔹 얼굴 인식 및 임베딩 추출 (평균)
+        extracted_embedding = extract_faces_and_embeddings(image)
+        if extracted_embedding is None:
+            return JSONResponse({"error": "얼굴을 감지하지 못했습니다."}, status_code=400)
+
+        extracted_embedding = np.array(extracted_embedding)
+        extracted_embedding = extracted_embedding / np.linalg.norm(extracted_embedding)
+
+        # 🔹 유사도 계산 (코사인 유사도)
+        similarity = float(np.dot(extracted_embedding, target_embedding))
+        print(f"🔍 유사도 계산됨: {similarity:.4f}")
+
+        return {"similarity": similarity}
+
+    except Exception as e:
+        return JSONResponse({"error": f"🚨 서버 오류: {str(e)}"}, status_code=500)

@@ -31,7 +31,7 @@ const FaceVerify = () => {
         formData.append("user_id", userInfo?.id); // ✅ 로그인된 사용자 ID 자동 입력
 
         try {
-            const response = await fetch(`${API_BASE_URL}/face-verify/`, {
+            const response = await fetch(`${API_BASE_URL}/detection/check-similarity/`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Token ${token}`, // ✅ 인증 토큰 포함
