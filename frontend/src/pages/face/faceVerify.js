@@ -27,7 +27,7 @@ const FaceVerify = () => {
         }
 
         const formData = new FormData();
-        formData.append("face_image", selectedFile);
+        formData.append("file", selectedFile);
         formData.append("user_id", userInfo?.id); // ✅ 로그인된 사용자 ID 자동 입력
 
         try {
@@ -44,7 +44,7 @@ const FaceVerify = () => {
             if (response.ok) {
                 setMessage(`✅ 결과: ${data.message} (유사도: ${data.similarity.toFixed(3)})`);
             } else {
-                setMessage(`❌ 오류: ${data.message}`);
+                setMessage(`❌ 오류: ${data.message || data.error}`);
             }
         } catch (error) {
             console.error("API 호출 오류:", error);

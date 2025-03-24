@@ -72,13 +72,12 @@ def extract_faces_and_embeddings(image):
     avg_embedding = np.mean(embeddings_list, axis=0).tolist()
     return avg_embedding
 
-def mask_matching_face(image, user_embedding, mask_type="black", threshold=0.5, emojis=None):
-    """특정 사용자와 유사한 얼굴만 마스킹하여 반환"""
+def mask_matching_face(image, family_embeddings, mask_type="black", threshold=0.5, emojis=None):
     faces = arcface_app.get(image)
     print(f"🔍 얼굴 감지됨: {len(faces)}개")
 
     if not faces:
-        return image  # 얼굴이 없으면 원본 그대로 반환
+        return image
 
     for face in faces:
         if "embedding" not in face:
@@ -87,26 +86,25 @@ def mask_matching_face(image, user_embedding, mask_type="black", threshold=0.5, 
         face_embedding = np.array(face["embedding"])
         face_embedding = face_embedding / np.linalg.norm(face_embedding)
 
-        sim = np.dot(user_embedding, face_embedding)
-        if sim < threshold:
-            continue
+        for user_id, emb in family_embeddings.items():
+            sim = np.dot(face_embedding, emb)
+            if sim >= threshold:
+                print(f"✅ 유사한 가족 구성원 탐지됨 (user_id={user_id}, sim={sim:.3f})")
 
-        # 유사한 얼굴 찾음 → 마스킹
-        x_min, y_min, x_max, y_max = map(int, face["bbox"])
-        w, h = x_max - x_min, y_max - y_min
+                # 마스킹 적용
+                x_min, y_min, x_max, y_max = map(int, face["bbox"])
+                w, h = x_max - x_min, y_max - y_min
 
-        if mask_type == "black":
-            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 0), -1)
-        elif mask_type == "blur":
-            face_roi = image[y_min:y_max, x_min:x_max]
-            face_roi = cv2.GaussianBlur(face_roi, (55, 55), 30)
-            image[y_min:y_max, x_min:x_max] = face_roi
-        elif mask_type in emojis and emojis[mask_type] is not None:
-            emoji = cv2.resize(emojis[mask_type], (w, h))
-            image[y_min:y_max, x_min:x_max] = emoji
+                if mask_type == "black":
+                    cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 0), -1)
+                elif mask_type == "blur":
+                    face_roi = image[y_min:y_max, x_min:x_max]
+                    face_roi = cv2.GaussianBlur(face_roi, (55, 55), 30)
+                    image[y_min:y_max, x_min:x_max] = face_roi
+                elif mask_type in emojis and emojis[mask_type] is not None:
+                    emoji = cv2.resize(emojis[mask_type], (w, h))
+                    image[y_min:y_max, x_min:x_max] = emoji
 
-        print("✅ 유사한 사용자 얼굴 마스킹 완료")
-
-        break  # 유사한 얼굴 하나만 마스킹하고 종료
+                break  # ✅ 해당 얼굴은 마스킹했으니 다음 얼굴로
 
     return image

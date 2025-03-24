@@ -43,13 +43,16 @@ def delete_file(file_path: str):
 async def process_video(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    title: str = "processed_video.mp4",
-    embedding_file: UploadFile = File(...),
-    mask_type: str = Form("black")
+    family_embeddings: str = Form(...),
+    user_id: str = Form(...),
+    # mask_type: str = Form("black")
 ):
+    
+    title = f"{user_id}_masked.mp4"
+
     # 🔹 로컬에서 저장할 폴더 경로 설정
     temp_input_path = os.path.join(LOCAL_VIDEO_DIR, f"input_{uuid.uuid4().hex}.mp4")
-    temp_output_path = os.path.join(LOCAL_VIDEO_DIR, title)
+    temp_output_path = os.path.join(LOCAL_VIDEO_DIR,  title)
 
     try:
         # 🔹 업로드된 파일을 저장
@@ -67,28 +70,31 @@ async def process_video(
 
 
         print("📄 [3] 사용자 임베딩 로드 중...")
-        embedding_bytes = await embedding_file.read()
-        user_embedding = json.loads(embedding_bytes.decode("utf-8"))  # ← 리스트로 파싱
-        user_embedding = np.array(user_embedding)
-        user_embedding = user_embedding / np.linalg.norm(user_embedding)
+        family_embeddings = json.loads(family_embeddings)
+        normalized_embeddings = {
+            user_id: np.array(vec) / np.linalg.norm(vec)
+            for user_id, vec in family_embeddings.items()
+        }
 
 
         print("🧠 [4] 프레임별 마스킹 처리 시작...")
         processed_frames = []
         for idx, frame in enumerate(frames):
             print(f"프레임 {idx + 1}/{len(frames)} 처리 중...")
-            processed_frame = mask_matching_face(frame, user_embedding, mask_type=mask_type)
-            processed_frames.append(processed_frame)
+            masked_frame = mask_matching_face(
+                frame,
+                normalized_embeddings,
+                # mask_type="black"
+            )
+            processed_frames.append(masked_frame)
         print("✅ 모든 프레임 마스킹 완료")
 
         # 🔹 처리된 비디오 저장
         print("💾 [5] 비디오 저장 중...")
         success = save_video(processed_frames, temp_output_path, fps, frame_size)
-
         if not success:
             return JSONResponse({"error": "🚨 비디오 저장 실패"}, status_code=500)
 
-        # 🔹 처리된 비디오와 원본 비디오를 비동기 삭제
         background_tasks.add_task(delete_file, temp_input_path)
         background_tasks.add_task(delete_file, temp_output_path)
 
