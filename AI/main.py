@@ -4,12 +4,10 @@ import uuid
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks, Form
 from fastapi.responses import FileResponse, JSONResponse
 from video_processing import extract_frames, save_video
-from face_detection import detect_faces
 from pydantic import BaseModel
 from pydantic import BaseModel
 from typing import List
-from embedding_extractor import extract_faces_and_embeddings
-import numpy as np
+from embedding_extractor import *
 import cv2
 import json
 
@@ -45,7 +43,9 @@ def delete_file(file_path: str):
 async def process_video(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    title: str = "processed_video.mp4"
+    title: str = "processed_video.mp4",
+    embedding_file: UploadFile = File(...),
+    mask_type: str = Form("black")
 ):
     # 🔹 로컬에서 저장할 폴더 경로 설정
     temp_input_path = os.path.join(LOCAL_VIDEO_DIR, f"input_{uuid.uuid4().hex}.mp4")
@@ -53,32 +53,36 @@ async def process_video(
 
     try:
         # 🔹 업로드된 파일을 저장
+        print("📥 [1] 영상 파일 저장 중...")
         with open(temp_input_path, "wb") as buffer:
             while chunk := file.file.read(1024 * 1024):  # 1MB 단위로 읽기
                 buffer.write(chunk)
 
         # 🔹 프레임 추출
+        print("🎞️ [2] 프레임 추출 중...")
         frames, fps, frame_size = extract_frames(temp_input_path)
-
         if frames is None:
             return JSONResponse({"error": "🚨 비디오 처리 실패"}, status_code=400)
+        print(f"✅ 총 {len(frames)}개 프레임 추출 완료 (FPS: {fps}, Size: {frame_size})")
 
 
-        # ✅ 얼굴 감지 최적화 (모델을 매번 로드하지 않고 사용)
-        def detect_faces_optimized(frame):
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-
-            for (x, y, w, h) in faces:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            return frame
+        print("📄 [3] 사용자 임베딩 로드 중...")
+        embedding_bytes = await embedding_file.read()
+        user_embedding = json.loads(embedding_bytes.decode("utf-8"))  # ← 리스트로 파싱
+        user_embedding = np.array(user_embedding)
+        user_embedding = user_embedding / np.linalg.norm(user_embedding)
 
 
-        # 🔹 얼굴 인식 추가: 각 프레임에서 얼굴을 감지하고 박스를 그리기
-        processed_frames = [detect_faces_optimized(frame) for frame in frames]
+        print("🧠 [4] 프레임별 마스킹 처리 시작...")
+        processed_frames = []
+        for idx, frame in enumerate(frames):
+            print(f"프레임 {idx + 1}/{len(frames)} 처리 중...")
+            processed_frame = mask_matching_face(frame, user_embedding, mask_type=mask_type)
+            processed_frames.append(processed_frame)
+        print("✅ 모든 프레임 마스킹 완료")
 
         # 🔹 처리된 비디오 저장
+        print("💾 [5] 비디오 저장 중...")
         success = save_video(processed_frames, temp_output_path, fps, frame_size)
 
         if not success:

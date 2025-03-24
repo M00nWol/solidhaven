@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import torch
 from insightface.app import FaceAnalysis
+import time
 
 
 # ✅ 기본 경로 설정
@@ -70,3 +71,42 @@ def extract_faces_and_embeddings(image):
     # 평균 임베딩 계산
     avg_embedding = np.mean(embeddings_list, axis=0).tolist()
     return avg_embedding
+
+def mask_matching_face(image, user_embedding, mask_type="black", threshold=0.5, emojis=None):
+    """특정 사용자와 유사한 얼굴만 마스킹하여 반환"""
+    faces = arcface_app.get(image)
+    print(f"🔍 얼굴 감지됨: {len(faces)}개")
+
+    if not faces:
+        return image  # 얼굴이 없으면 원본 그대로 반환
+
+    for face in faces:
+        if "embedding" not in face:
+            continue
+
+        face_embedding = np.array(face["embedding"])
+        face_embedding = face_embedding / np.linalg.norm(face_embedding)
+
+        sim = np.dot(user_embedding, face_embedding)
+        if sim < threshold:
+            continue
+
+        # 유사한 얼굴 찾음 → 마스킹
+        x_min, y_min, x_max, y_max = map(int, face["bbox"])
+        w, h = x_max - x_min, y_max - y_min
+
+        if mask_type == "black":
+            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (0, 0, 0), -1)
+        elif mask_type == "blur":
+            face_roi = image[y_min:y_max, x_min:x_max]
+            face_roi = cv2.GaussianBlur(face_roi, (55, 55), 30)
+            image[y_min:y_max, x_min:x_max] = face_roi
+        elif mask_type in emojis and emojis[mask_type] is not None:
+            emoji = cv2.resize(emojis[mask_type], (w, h))
+            image[y_min:y_max, x_min:x_max] = emoji
+
+        print("✅ 유사한 사용자 얼굴 마스킹 완료")
+
+        break  # 유사한 얼굴 하나만 마스킹하고 종료
+
+    return image
