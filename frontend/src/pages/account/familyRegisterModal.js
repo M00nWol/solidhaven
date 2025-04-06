@@ -37,9 +37,10 @@ const FamilyRegisterModal = ({ onClose }) => {
 
             if (response.ok) {
                 setFamilyCode(data.family?.family_code || "가족 코드 생성 실패");
-                setMessage(`가족 회원가입이 완료되었습니다! 가족 목록: ${data.user.family.join(", ")}`);
+                setMessage(`가족 회원가입이 완료되었습니다!`);
             } else {
-                setMessage(data.message || "이미 존재하는 가족 이메일입니다.");
+                const errorMessage = data?.error || data?.message || "이미 존재하는 가족 이메일입니다.";
+                setMessage(errorMessage);
             }
         } catch (error) {
             console.error("가족 회원가입 오류:", error);

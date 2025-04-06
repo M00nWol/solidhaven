@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { useUser } from "../../components/context/UserContext";
+import { useNavigate } from "react-router-dom"; // 페이지 이동을 위해 사용
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-const FamilyLoginModal = ({ onClose }) => {
+const FamilyLoginModal = ({ onClose, onRegister }) => {
     const { token, updateFamilyCode } = useUser();
     const [familyCode, setFamilyCode] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         if (!token) {
@@ -29,10 +31,11 @@ const FamilyLoginModal = ({ onClose }) => {
 
             if (response.ok) {
                 setMessage("가족 로그인에 성공했습니다!");
-                await updateFamilyCode(); // ✅ 가족 로그인 후 `current_family_code` 최신화
+                await updateFamilyCode();
                 onClose();
             } else {
-                setMessage("가족 코드 또는 비밀번호가 일치하지 않습니다.");
+                const errorMessage = data?.error || "가족 코드 또는 비밀번호가 일치하지 않습니다.";
+                setMessage(errorMessage);
             }
         } catch (error) {
             console.error("가족 로그인 오류:", error);
@@ -59,6 +62,9 @@ const FamilyLoginModal = ({ onClose }) => {
                 />
                 {message && <p className="modal-message">{message}</p>}
                 <button onClick={handleLogin} className="submit-button">로그인</button>
+                <button onClick={() => navigate("/userregister")} className="button">
+                   회원가입
+                </button>
             </div>
         </div>
     );
