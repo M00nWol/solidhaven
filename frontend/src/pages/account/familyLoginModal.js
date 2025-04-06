@@ -62,7 +62,7 @@ const FamilyLoginModal = ({ onClose, onRegister }) => {
                 />
                 {message && <p className="modal-message">{message}</p>}
                 <button onClick={handleLogin} className="submit-button">로그인</button>
-                <button onClick={() => navigate("/userregister")} className="button">
+                <button onClick={() => navigate("/userregister")} className="submit-button">
                    회원가입
                 </button>
             </div>
