@@ -27,11 +27,11 @@ const UserLogin = () => {
             const data = await response.json();
 
             if (response.ok) {
-                const { token, user, face_registered } = data; 
+                const { token, user } = data;
 
                 login(token, user);
 
-                if (face_registered) {
+                if (user.face_registered) {
                     navigate("/dashboard"); // 얼굴 등록 완료 → 대시보드 이동
                 } else {
                     navigate("/faceregister"); // 얼굴 등록 필요 → 얼굴 등록 페이지 이동
