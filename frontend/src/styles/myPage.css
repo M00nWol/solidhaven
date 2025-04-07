@@ -132,3 +132,17 @@ input:checked + .slider::before {
     background-color: #ffebcd; /* 현재 가족 강조 */
     font-weight: bold;
 }
+
+.emoji-selector-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(-10px); }
+to { opacity: 1; transform: translateY(0); }
+}

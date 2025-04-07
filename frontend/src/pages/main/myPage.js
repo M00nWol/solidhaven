@@ -20,6 +20,10 @@ const MyPage = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const [showFamilyLogin, setShowFamilyLogin] = useState(false);
     const [showFamilyRegister, setShowFamilyRegister] = useState(false);
+    const [emojiList, setEmojiList] = useState([]);
+    const [selectedEmoji, setSelectedEmoji] = useState("");
+    const [savedEmoji, setSavedEmoji] = useState("");  
+    const [showEmojiSelector, setShowEmojiSelector] = useState(false);
 
     const navigate = useNavigate();
 
@@ -62,6 +66,10 @@ const MyPage = () => {
                 } else {
                     setFamilyList([]);
                 }
+
+                setSavedEmoji(data.face_masking_emoji || "");
+                setSelectedEmoji(data.face_masking_emoji || "");
+
             } else if (response.status === 401) {
                 alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
                 logout();
@@ -79,6 +87,7 @@ const MyPage = () => {
     useEffect(() => {
         if (token) {
             fetchUserInfo();
+            fetchEmojiChoices();
         }
     }, [token, currentFamilyCode]);
 
@@ -122,6 +131,50 @@ const MyPage = () => {
     // ✅ 얼굴 등록 페이지로 이동
     const handleFaceRegister = () => {
         navigate("/faceregister", { state: { fromMyPage: true } });
+    };
+
+    const fetchEmojiChoices = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/emojis/`, {
+                headers: {
+                    Authorization: `Token ${token}`,
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setEmojiList(data);
+            }
+        } catch (error) {
+            console.error("이모지 목록 불러오기 실패:", error);
+        }
+    };
+
+    const saveSelectedEmoji = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/select-emoji/`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Token ${token}`,
+                },
+                body: JSON.stringify({
+                    face_masking_emoji: selectedEmoji,
+                }),
+            });
+    
+            const data = await response.json();
+    
+            if (response.ok) {
+                setSuccessMessage("✅ 이모지가 저장되었습니다.");
+                setSavedEmoji(selectedEmoji);  // ✅ 실제 저장된 이모지로 갱신
+                setShowEmojiSelector(false);   // (선택) 설정창 닫기
+            } else {
+                setErrorMessage(data.message || "⚠ 이모지 저장에 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("이모지 저장 오류:", error);
+            setErrorMessage("⚠ 서버 오류로 이모지를 저장하지 못했습니다.");
+        }
     };
 
     return (
@@ -190,6 +243,35 @@ const MyPage = () => {
                 </div>
 
                 <button className="button" onClick={updateMaskingSettings}>마스킹 설정 변경 저장</button>
+
+                <p><strong>현재 마스킹 이모지:</strong> <span style={{ fontSize: "1.5rem" }}>{savedEmoji || "없음"}</span></p>
+                <button
+                    className="button"
+                    onClick={() => setShowEmojiSelector((prev) => !prev)}
+                    >
+                    {showEmojiSelector ? "이모지 설정 닫기" : "이모지 설정하기"}
+                </button>
+
+                {showEmojiSelector && (
+                    <div className="emoji-selector-container">
+                        <div className="emoji-selector">
+                        {emojiList.map((emoji, idx) => (
+                            <label key={idx} className="emoji-option">
+                            <input
+                                type="radio"
+                                name="emoji"
+                                value={emoji.code}
+                                checked={selectedEmoji === emoji.code}
+                                onChange={() => setSelectedEmoji(emoji.code)}
+                            />
+                            <span style={{ fontSize: "1.8rem", marginRight: "0.5rem" }}>{emoji.code}</span>
+                            <span>{emoji.label}</span>
+                            </label>
+                        ))}
+                        </div>
+                        <button className="button" onClick={saveSelectedEmoji}>이모지 저장</button>
+                    </div>
+                )}
             </div>
 
             {/* ✅ 가족 로그인 모달 */}

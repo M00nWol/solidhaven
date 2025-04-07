@@ -30,6 +30,8 @@ const UserLogin = () => {
                 const { token, user } = data;
 
                 login(token, user);
+                console.log("로그인한 사용자:", user);
+                console.log("face_registered 값:", user.face_registered);
 
                 if (user.face_registered) {
                     navigate("/dashboard"); // 얼굴 등록 완료 → 대시보드 이동
