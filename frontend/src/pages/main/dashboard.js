@@ -34,6 +34,13 @@ const Dashboard = () => {
                     얼굴 체크
                 </button>
             </div>
+
+            {/* ✅ 실시간 카메라 제어 페이지로 가는 버튼 */}
+            <div className="camera-control-button-container">
+                <button onClick={() => navigate("/camera-control")} className="button">
+                    실시간 카메라 제어
+                </button>
+            </div>
         </div>
     );
 };

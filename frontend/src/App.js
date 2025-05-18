@@ -5,6 +5,7 @@ import { UserLogin, UserRegister, AccountMain } from "./pages"; // account 폴�
 import { FaceRegister, MaskingSelection, FaceVerify } from "./pages";
 import { Dashboard, MyPage } from "./pages";
 import { VideoDashboard, VideoList, VideoUpload, VideoPlayer } from "./pages"; 
+import CameraControl from "./pages/realtime/CameraControl";
 
 const App = () => {
     return (
@@ -30,6 +31,9 @@ const App = () => {
                     <Route path="/videolist" element={<VideoList />} />
                     <Route path="/videoupload" element={<VideoUpload />} />
                     <Route path="/videos/:videoId" element={<VideoPlayer />} />
+
+                    {/* ✅ CameraControl 전용 라우트 추가 */}
+                    <Route path="/camera-control" element={<CameraControl />} />
                 </Routes>
             </Router>
         </UserProvider>
