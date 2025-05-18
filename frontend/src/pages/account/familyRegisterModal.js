@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "../../styles/modal.css";
-import { useUser } from "../../components/context/UserContext"; 
+import { useUser } from "../../components/context/UserContext";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-const FamilyRegisterModal = ({ onClose }) => {
+const FamilyRegisterModal = ({ onClose, onBackToLogin }) => {
     const { token } = useUser();
     const [familyName, setFamilyName] = useState("");
     const [email, setEmail] = useState("");
@@ -75,11 +75,13 @@ const FamilyRegisterModal = ({ onClose }) => {
                         />
                         {message && <p className="modal-message">{message}</p>}
                         <button onClick={handleRegister} className="submit-button">회원가입</button>
+                        <button onClick={onBackToLogin} className="submit-button">가족 로그인으로 돌아가기</button>
                     </>
                 ) : (
                     <div>
                         <p className="modal-message">{message}</p>
                         <p><strong>가족 코드:</strong> {familyCode}</p>
+                        <button onClick={onBackToLogin} className="submit-button">가족 로그인으로 돌아가기</button>
                     </div>
                 )}
             </div>

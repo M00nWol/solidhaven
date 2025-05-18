@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useUser } from "../../components/context/UserContext";
-import { useNavigate } from "react-router-dom"; // 페이지 이동을 위해 사용
+import { useNavigate } from "react-router-dom";
+import FamilyRegisterModal from "./familyRegisterModal"; // 회원가입 모달 가져오기
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-const FamilyLoginModal = ({ onClose, onRegister }) => {
+const FamilyLoginModal = ({ onClose }) => {
     const { token, updateFamilyCode } = useUser();
     const [familyCode, setFamilyCode] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [showRegisterModal, setShowRegisterModal] = useState(false); // ✅ 내부 상태로 제어
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -43,30 +45,41 @@ const FamilyLoginModal = ({ onClose, onRegister }) => {
         }
     };
 
+    // 🔁 회원가입 모달 닫고 다시 로그인 모달로 돌아오는 함수
+    const handleBackToLogin = () => {
+        setShowRegisterModal(false);
+    };
+
     return (
-        <div className="modal-container">
-            <div className="modal-content">
-                <button className="modal-close-button" onClick={onClose}>✖</button>
-                <h2>가족 로그인</h2>
-                <input 
-                    type="text" 
-                    placeholder="가족 코드" 
-                    value={familyCode} 
-                    onChange={(e) => setFamilyCode(e.target.value)} 
-                />
-                <input 
-                    type="password" 
-                    placeholder="비밀번호" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                />
-                {message && <p className="modal-message">{message}</p>}
-                <button onClick={handleLogin} className="submit-button">로그인</button>
-                <button onClick={() => navigate("/userregister")} className="submit-button">
-                   회원가입
-                </button>
-            </div>
-        </div>
+        <>
+            {showRegisterModal ? (
+                <FamilyRegisterModal onClose={onClose} onBackToLogin={handleBackToLogin} />
+            ) : (
+                <div className="modal-container">
+                    <div className="modal-content">
+                        <button className="modal-close-button" onClick={onClose}>✖</button>
+                        <h2>가족 로그인</h2>
+                        <input 
+                            type="text" 
+                            placeholder="가족 코드" 
+                            value={familyCode} 
+                            onChange={(e) => setFamilyCode(e.target.value)} 
+                        />
+                        <input 
+                            type="password" 
+                            placeholder="비밀번호" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                        />
+                        {message && <p className="modal-message">{message}</p>}
+                        <button onClick={handleLogin} className="submit-button">가족 로그인</button>
+                        <button onClick={() => setShowRegisterModal(true)} className="submit-button">
+                            가족 회원가입
+                        </button>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 
