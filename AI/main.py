@@ -2,7 +2,7 @@
 import os
 import uuid
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks, Form
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from video_processing import extract_frames, save_video
 from pydantic import BaseModel
 from pydantic import BaseModel
@@ -10,6 +10,12 @@ from typing import List
 from embedding_extractor import *
 import cv2
 import json
+import uuid
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from s3_utils import s3_client
 
 app = FastAPI()
 
@@ -164,3 +170,56 @@ async def check_similarity(
 
     except Exception as e:
         return JSONResponse({"error": f"🚨 서버 오류: {str(e)}"}, status_code=500)
+    
+
+@app.post("/realtime/")
+async def receive_and_return_masked_frame(
+    family_code: str = Form(...),
+    frame: UploadFile = File(...),
+    family_embeddings: str = Form(...)
+):
+    try:
+        # 1. 프레임 로딩
+        frame_bytes = await frame.read()
+        nparr = np.frombuffer(frame_bytes, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        if image is None:
+            return JSONResponse(status_code=400, content={"error": "Invalid image format"})
+
+        # 2. 임베딩 로드 및 정규화
+        family_embeddings = json.loads(family_embeddings)
+        normalized_embeddings = {
+            user_id: np.array(vec) / np.linalg.norm(vec)
+            for user_id, vec in family_embeddings.items()
+        }
+
+        # 3. 마스킹 처리
+        masked_frame = mask_matching_face(image, normalized_embeddings)
+
+        # 4. JPEG로 인코딩 후 바이너리 응답
+        _, encoded = cv2.imencode('.jpg', masked_frame)
+        return Response(
+            content=encoded.tobytes(),
+            media_type="image/jpeg",
+            headers={"X-Family-Code": family_code}
+        )
+
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+    
+
+@app.post("/upload/masked/")
+async def upload_masked_video(file: UploadFile = File(...)):
+    try:
+        file_ext = file.filename.split('.')[-1]
+        filename = f"masked_videos/{uuid.uuid4()}.{file_ext}"
+
+        # S3에 파일 업로드
+        s3_client.upload_fileobj(file.file, "homecam-bucket", filename)
+
+        # 업로드된 파일 URL 반환
+        s3_url = f"https://homecam-bucket.s3.ap-northeast-2.amazonaws.com/{filename}"
+        return {"file_url": s3_url}
+
+    except Exception as e:
+        return {"error": str(e)}

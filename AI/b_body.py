@@ -204,7 +204,7 @@ def is_exposed(landmark, skin_mask, landmarks):
             return False
     return (skin_cnt / tot) >= EXPOSURE_THRESHOLD
 
-def create_json_and_visualize(image_path, json_path, masked_output_path):
+def create_json_and_visualize(image_path, json_path, masked_output_path, target_face_bbox=None):
     seg_map = segment_image(image_path)
     skin_mask = get_skin_mask(image_path, seg_map)
     img = cv2.imread(image_path)
@@ -212,6 +212,10 @@ def create_json_and_visualize(image_path, json_path, masked_output_path):
     full_output = []
     important_ids = [38, 39, 36, 23, 24, 40, 43, 44, 45, 46, 47, 48, 49]
     for person_idx, (landmarks, bbox) in enumerate(zip(landmarks_list, bboxes)):
+
+        if target_face_bbox and not bbox_contains(bbox, target_face_bbox):
+            continue
+
         person_data = {"person": person_idx, "bbox": list(bbox), "landmarks": []}
         for idx in important_ids:
             if idx not in landmarks:
@@ -380,7 +384,7 @@ def mask_exposed_regions_with_blur(json_path, input_image_path, output_image_pat
 def pipeline(face_json_path, image_path, json_output_path, masked_output_path,
              bbox_output_path, blur_output_path, matched_face_bbox=None):
     print("\n🔄 [Step 1] 신체 랜드마크 및 노출 판별 실행...")
-    create_json_and_visualize(image_path, json_output_path, masked_output_path)
+    create_json_and_visualize(image_path, json_output_path, masked_output_path, target_face_bbox=matched_face_bbox)
     face_data = load_json(face_json_path)
     body_data = load_json(json_output_path)
 

@@ -1,8 +1,8 @@
 # ✅ exposure_pipeline_runner.py
 import os
-from body import run_pipeline
-from face_matcher import find_matching_face
-from face_embedding_extractor import extract_face_embeddings
+from b_body import run_pipeline
+from b_face_matcher import find_matching_face
+from b_face_embedding import extract_face_embeddings
 
 # 기준 얼굴 임베딩 (DB에서 온 거)
 face_json = "data/face.json"

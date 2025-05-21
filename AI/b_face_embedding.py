@@ -1,4 +1,5 @@
-# face_embedding_extractor.py
+# face_embedding.py
+# 다인 사진에서 임베딩을 추출하는 코드
 
 import os
 import cv2

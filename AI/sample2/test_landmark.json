@@ -1,0 +1,104 @@
+[
+    {
+        "person": 1,
+        "bbox": [
+            175,
+            86,
+            312,
+            468
+        ],
+        "landmarks": [
+            {
+                "id": 38,
+                "x": 261,
+                "y": 242,
+                "name": "Left Nipple",
+                "exposure": "covered"
+            },
+            {
+                "id": 39,
+                "x": 218,
+                "y": 237,
+                "name": "Right Nipple",
+                "exposure": "covered"
+            },
+            {
+                "id": 36,
+                "x": 250,
+                "y": 354,
+                "name": "Genital",
+                "exposure": "covered"
+            },
+            {
+                "id": 23,
+                "x": 277,
+                "y": 355,
+                "name": "Landmark_23",
+                "exposure": "covered"
+            },
+            {
+                "id": 24,
+                "x": 224,
+                "y": 354,
+                "name": "Landmark_24",
+                "exposure": "covered"
+            },
+            {
+                "id": 40,
+                "x": 239,
+                "y": 239,
+                "name": "Chest Center",
+                "exposure": "covered"
+            },
+            {
+                "id": 43,
+                "x": 277,
+                "y": 385,
+                "name": "Left Upper Thigh 2",
+                "exposure": "covered"
+            },
+            {
+                "id": 44,
+                "x": 225,
+                "y": 386,
+                "name": "Right Upper Thigh 2",
+                "exposure": "covered"
+            },
+            {
+                "id": 45,
+                "x": 241,
+                "y": 258,
+                "name": "Underbust Center",
+                "exposure": "covered"
+            },
+            {
+                "id": 46,
+                "x": 264,
+                "y": 264,
+                "name": "Left Underbust",
+                "exposure": "covered"
+            },
+            {
+                "id": 47,
+                "x": 219,
+                "y": 260,
+                "name": "Right Underbust",
+                "exposure": "covered"
+            },
+            {
+                "id": 48,
+                "x": 246,
+                "y": 316,
+                "name": "Abdomen Center",
+                "exposure": "covered"
+            },
+            {
+                "id": 49,
+                "x": 247,
+                "y": 178,
+                "name": "Neck",
+                "exposure": "exposed"
+            }
+        ]
+    }
+]
