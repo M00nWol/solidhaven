@@ -6,12 +6,13 @@ import "../../styles/faceRegister.css";
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const FaceRegister = () => {
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
     const [message, setMessage] = useState("");
     const { token, logout } = useUser();
     const navigate = useNavigate();
     const location = useLocation();
 
+    
     // ✅ MyPage에서 실행된 경우 확인
     const isFromMyPage = location.state?.fromMyPage || false;
 
@@ -22,23 +23,23 @@ const FaceRegister = () => {
     const [isCapturing, setIsCapturing] = useState(false);
     const [captureCount, setCaptureCount] = useState(0);
 
-    const CAPTURE_COUNT = 8;  // 8장 촬영
-    const CAPTURE_INTERVAL = 500; // 0.5초 간격
+    const CAPTURE_COUNT = 6;
+    const CAPTURE_INTERVAL = 1500;
 
-
-        // ✅ 파일 업로드 핸들러 (기존 기능 유지)
     const handleFileChange = (event) => {
-        setSelectedFile(event.target.files[0]);
+        setSelectedFiles(Array.from(event.target.files));
     };
 
     const handleFileUpload = async () => {
-        if (!selectedFile) {
+        if (selectedFiles.length === 0) {
             alert("사진 파일을 선택해주세요!");
             return;
         }
 
         const formData = new FormData();
-        formData.append("face_image", selectedFile);
+        selectedFiles.forEach((file) => {
+            formData.append("face_images", file);  // ✅ 이름 맞춰야 함
+        });
 
         console.log("현재 저장된 토큰:", token);
         try {
@@ -68,6 +69,7 @@ const FaceRegister = () => {
         }
     };
 
+
     // ✅ 웹캠 켜기
     const startWebcam = async () => {
         try {
@@ -90,37 +92,45 @@ const FaceRegister = () => {
         setIsCameraOn(false);
     };
 
-    // ✅ 0.5초 간격으로 8장 촬영 후 서버로 전송
     const captureMultipleImages = async () => {
-        if (!videoRef.current || !videoRef.current.srcObject) {
-            alert("웹캠을 먼저 켜주세요!");
-            return;
+    if (!videoRef.current || !videoRef.current.srcObject) {
+        alert("웹캠을 먼저 켜주세요!");
+        return;
+    }
+
+    setIsCapturing(true);
+    setCaptureCount(0);
+    setMessage("📸 얼굴 이미지를 촬영 중...");
+
+    let images = [];
+
+    for (let i = 0; i < CAPTURE_COUNT; i++) {
+        // 📢 단계별 안내 메시지
+        if (i === 0) {
+            setMessage("🧍 정면을 바라봐 주세요...");
+        } else if (i === 2) {
+            setMessage("↖ 좌측을 천천히 바라봐 주세요...");
+        } else if (i === 4) {
+            setMessage("↗ 우측을 천천히 바라봐 주세요...");
         }
 
-        setIsCapturing(true);
-        setCaptureCount(0);
-        setMessage("📸 얼굴 이미지를 촬영 중...");
+        await new Promise((resolve) => setTimeout(resolve, CAPTURE_INTERVAL));
 
-        let images = [];
+        const canvas = canvasRef.current;
+        const context = canvas.getContext("2d");
+        context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-        for (let i = 0; i < CAPTURE_COUNT; i++) {
-            await new Promise((resolve) => setTimeout(resolve, CAPTURE_INTERVAL));
+        images.push(new Promise((resolve) => {
+            canvas.toBlob((blob) => {
+                setCaptureCount((prev) => prev + 1);
+                resolve(blob);
+            }, "image/jpeg");
+        }));
+    }
 
-            const canvas = canvasRef.current;
-            const context = canvas.getContext("2d");
-            context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
-            images.push(new Promise((resolve) => {
-                canvas.toBlob((blob) => {
-                    setCaptureCount(prevCount => prevCount + 1);
-                    resolve(blob);
-                }, "image/jpeg");
-            }));
-        }
-
-        const capturedBlobs = await Promise.all(images);
-        sendImagesToServer(capturedBlobs);
-    };
+    const capturedBlobs = await Promise.all(images);
+    sendImagesToServer(capturedBlobs);
+};
 
     // ✅ 서버로 촬영한 이미지 전송
     const sendImagesToServer = async (images) => {
@@ -174,7 +184,10 @@ const FaceRegister = () => {
             <div className="register-section">
                 <h2>사진으로 등록하기</h2>
                 <div className="file-upload">
-                    <input type="file" accept="image/*" onChange={handleFileChange} />
+                    <input type="file" accept="image/*" multiple onChange={handleFileChange}/>
+                    <p style={{ fontSize: "0.9rem", color: "#666", marginTop: "0.5rem" }}>
+                        ※ 정면과 좌/우측 사진을 함께 등록하면 인식 정확도가 높아집니다.
+                    </p>
                     <button onClick={handleFileUpload} className="button">
                         사진 업로드
                     </button>
